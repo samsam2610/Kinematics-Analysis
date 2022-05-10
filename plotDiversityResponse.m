@@ -14,13 +14,13 @@ expressionResponse = {'(flex|flexision|flextion|Flex)', '(ext|extension|extend)'
 parameterTable = readtable('video-data.csv', 'DatetimeType','text', 'TextType', 'string');
 parameterTable.('RecordedDate') = datetime(parameterTable.('RecordedDate'), 'InputFormat', 'MM/dd/yy');
 
-startPath = '/Users/sam/Library/CloudStorage/OneDrive-NorthwesternUniversity/Documents/Wireless Interface Kinematics';
+startPath = '/Users/sam/Library/CloudStorage/OneDrive-NorthwesternUniversity/Documents/Wireless Interface Kinematics/Freddy For Diverse Responses';
 folderPath = '';
 
 parameterTable = readtable('video-data.csv', 'DatetimeType','text', 'TextType', 'string');
 parameterTable.('RecordedDate') = datetime(parameterTable.('RecordedDate'), 'InputFormat', 'MM/dd/yy');
 
-startPath = '/Users/sam/Library/CloudStorage/OneDrive-NorthwesternUniversity/WSI Videos for Manuscript/Channel Modulation/Freddy For Diverse Responses';
+% startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\Wireless Interface Kinematics\Freddy For Diverse Responses';
 
 csvPaths = {
             'Right side channels', ...
@@ -76,7 +76,7 @@ for indexPath = 1:numberFiles
                 x_axis = 0;
                 if indexResponse == 1 % flexion
                     u = [0 -1];
-                elseif indexResponse == 2
+                elseif indexResponse == 2 % extension
                     u = [0 1];
                 end
                 break
@@ -124,33 +124,32 @@ for indexPath = 1:numberFiles
         x = [0 dataTable.('data_X')(indexTable)];
         y = [0 dataTable.('data_Y')(indexTable)];
         
-        h = plot(x, y, ...
+        h = quiver(0, 0, x(2), y(2), ...
                  'LineWidth', 1.5, ...
-                 'Color', colorLineUnique{indexPath}, ...
-                 'HandleVisibility', 'off');
+                 'Color', colorLineUnique{indexTable}, ...
+                 'AutoScale', 'off', ...
+                 'MaxHeadSize', 0.1, ...
+                 'DisplayName', string(currentTitle(3)));
 
-        if turnOnLegend
-           h(1).DisplayName = string(displayName{indexPath});
-           h(1).HandleVisibility = 'on';
-           turnOnLegend = false;
-        end
         hold on
-
+        dataTable.('Object')(indexTable) = h;
         indexTable = indexTable + 1;
     end
 end
-hleg = legend;
-set(hleg, 'FontSize', 12, 'visible', 'on', 'Location', 'southeast');
-
 axis equal
 
 xlimData = xlim;
+xlimData(2) = 120;
 xlimData(1) = -1*xlimData(2);
 xlim(xlimData);
 
 ylimData = ylim;
+ylimData(2) = 120;
 ylimData(1) = -1*ylimData(2);
 ylim(ylimData);
+
+xticks([xlimData(1):20:xlimData(2)]);
+yticks([ylimData(1):20:ylimData(2)]);
 
 text(xlimData(1)/2, ylimData(2)/2, 'Flexion', 'HorizontalAlignment', 'center', 'fontweight', 'bold', 'FontName', 'Arial')
 text(xlimData(2)/2, ylimData(2)/2, 'Extension', 'HorizontalAlignment', 'center', 'fontweight', 'bold', 'FontName', 'Arial')
@@ -166,6 +165,20 @@ set(gca, ...
     'fontsize', 12, ...
     'XAxisLocation', 'origin', ...
     'YAxisLocation', 'origin');
+
+
+flexionObjects = table2array(dataTable(dataTable.Response == 1, 'Object'));
+hleg = legend(ax1, flexionObjects);
+set(hleg, 'FontSize', 12, 'fontweight', 'bold', 'FontName', 'Arial', ...
+          'visible', 'on', 'Location', 'southwest');
+hold off
+
+ax2 = axes('position',get(gca,'position'),'visible','off');
+extensionObjects = table2array(dataTable(dataTable.Response == 2, 'Object'));
+hleg = legend(ax2, extensionObjects);
+set(hleg, 'FontSize', 10, 'fontweight', 'bold', 'FontName', 'Arial', ...
+          'visible', 'on', 'Location', 'southeast');
+
 
 figName = "Diversity of response";
 ax = gcf;

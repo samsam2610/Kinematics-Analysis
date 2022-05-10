@@ -1,8 +1,8 @@
 clear all
 load dataFull_Amp_Modul_2.mat
 load lookupAmpTable.mat
-startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Recruitment Curve\Medusa';
-% startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Recruitment Curve\Medusa\Pulse width modulation\Spinal';
+% startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Recruitment Curve\Medusa\Amp modulation\Old Old Spinal';
+startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Recruitment Curve\Medusa\Amp modulation\Old Old Spinal';
 targetTypeNames = {'single pulse'; 'tetanic'};
 targetTypeVariables = {'SAM', 'TAM'};
 list_of_joints = {{'pelvisTop', 'hip', 'knee', 'hip angles'}, ...
@@ -26,7 +26,7 @@ intensityUnique = unique(dataFull_small(:, 1));
 [groupUnique, ~, groupUniqueIndex] = unique(dataFull_name(:, 2));
 colorLineUnique = {'#0072BD', '#D95319', '#EDB120', '#7E2F8E', '#A2142F', ...
              '#4DBEEE', '#77AC30', '#40E0D0', '#6495ED', '#88A096', ...
-             '#F8D210', '#94d2bd'};
+             '#F8D210', '#94d2bd', '#0072BD', '#D95319', '#EDB120'};
 
 colorLine = {'#cddafd',	'#dfe7fd',	'#80FFDB',	'#72EFDD', ...
              '#64DFDF',	'#56CFE1',	'#48BFE3',	'#4EA8DE', ...
@@ -272,7 +272,7 @@ for indexTable = 1:height(currentData_Max)
     skeletonInitial = SkeletonModel(currentData_Max(indexTable, :));
     plotName =  " ADC = " + num2str(currentValueData(indexTable, 1)) + "";
 %     ax = skeletonInitial.plotPosition(ax, colorLine{indexTable}, plotName, flipSkeleton);
-    ax = skeletonInitial.plotPositionUpdate(ax, colorPallete=colorLine{indexTable}, ...
+    ax = skeletonInitial.plotPositionUpdate(ax, colorPallete=colorLineUnique{1}, ...
                                                 plotName=plotName, ...
                                                 flipSkeleton=flipSkeleton, ...
                                                 LineWidth=3, ...
@@ -486,8 +486,12 @@ subjectIndex = 1;
 groupIndex = 1;
 currentSubject = subjectUnique{subjectIndex};
 currentGroup = groupUnique{groupIndex};
+dataFull_small(~any(dataFull_small,2), : ) = [];
+
+channelNumber = 6; % channel 2 or 5, input 3 or 6 
 
 indexData = and((subjectUniqueIndex(:) == subjectIndex), (groupUniqueIndex(:) == groupIndex));
+indexData = and(indexData, dataFull_small(:, 3) == channelNumber);
 currentData_Max = dataFull_skeletonMax(indexData, :);
 currentData_Min = dataFull_skeletonMin(indexData, :);
 
@@ -514,21 +518,20 @@ dataExport.(rowName) = -1;
 dataExport = [dataExport, skeletonRow];
 plotName =  " Resting position ";
 % ax = skeletonInitial.plotPosition(ax, colorLineUnique{5}, plotName, flipSkeleton);
-ax = skeletonInitial.plotPositionUpdate(ax, colorPallete=colorLineUnique{5}, ...
+ax = skeletonInitial.plotPositionUpdate(ax, colorPallete='#FF0000', ...
                                             plotName=plotName, ...
                                             flipSkeleton=flipSkeleton, ...
-                                            LineWidth=3, ...
-                                            LineStyle='--', ...
+                                            LineWidth=1, ...
                                             MarkerSize=50);
 
 for indexTable = 1:height(currentData_Max)
     skeletonInitial = SkeletonModel(currentData_Max(indexTable, :));
     plotName =  " ADC = " + num2str(currentValueData(indexTable, 1));
 %     ax = skeletonInitial.plotPosition(ax, colorLine{indexTable}, plotName);
-    ax = skeletonInitial.plotPositionUpdate(ax, colorPallete=colorLine{indexTable}, ...
+    ax = skeletonInitial.plotPositionUpdate(ax, colorPallete='#00FFFF', ...
                                                 plotName=plotName, ...
                                                 flipSkeleton=flipSkeleton, ...
-                                                LineWidth=3, ...
+                                                LineWidth=1, ...
                                                 MarkerSize=50);
 
     currentRow = table;
@@ -537,6 +540,18 @@ for indexTable = 1:height(currentData_Max)
     currentRow = [currentRow, skeletonRow];
     dataExport = [dataExport; currentRow];
 end
+
+plot(xline(:, 1), xline(:, 2), 'LineWidth', 1.5, ...
+'Color', [0 0 0], ...
+'HandleVisibility','off')
+text(xlimData(1) + xoffset + 1 - 0.1, ylimData(1) + yoffset + 0.2, '1 cm', 'HorizontalAlignment', 'right')
+
+yline = [xlimData(1) + xoffset, ylimData(1) + yoffset;...
+xlimData(1) + xoffset, ylimData(1) + yoffset - 1];
+plot(yline(:, 1), yline(:, 2), 'LineWidth', 1.5, ...
+'Color', [0 0 0], ...
+'HandleVisibility','off')
+text(xlimData(1) + xoffset - 0.5, ylimData(1) + yoffset - 0.5, '1 cm', 'HorizontalAlignment', 'center')
 
 hleg = legend;
 set(hleg, 'FontSize', 12, 'visible', 'on', 'Location', 'NorthEast');
@@ -614,19 +629,52 @@ for groupIndex = 1:2:3
     end
         
 end
-hleg = legend;
-set(hleg, 'FontSize', 10, 'visible', 'on', 'Location', 'northeast', 'FontName', 'Arial');
 
-ax = gca;
-ax.XAxis.FontSize = 14;
-ax.YAxis.FontSize = 14;
 
-xlabel('Amplitude (µA)', 'FontSize', 10, 'fontweight', 'bold', 'FontName', 'Arial')
-ylabel('Toe displacement (pixel)', 'FontSize', 10, 'fontweight', 'bold', 'FontName', 'Arial');
 ylimData = ylim;
 ylimData(1) = 0;
-ylimData(2) = ylimData(2);
+ylimData(2) = 7;
 ylim(ylimData);
+
+ax = gca;
+
+ax.YAxis.FontSize = 14;
+xlabel('Amplitude (µA)', 'FontSize', 10, 'fontweight', 'bold', 'FontName', 'Arial')
+ylabel('Toe displacement (pixel)', 'FontSize', 10, 'fontweight', 'bold', 'FontName', 'Arial');
+
+% Plot the compliance voltage
+compVoltage = readtable('Compliance Voltage.xlsx');
+for indexComp = 1:3:4
+    x = table2array(compVoltage(:, indexComp));
+    x = x(~isnan(x));
+    y = table2array(compVoltage(:, indexComp + 1));
+    y = y(~isnan(y));
+    [x, xIndex] = sort(x);
+    y = y(xIndex);
+    x = lookupAmpTable(x-1, 2)*1000;
+
+    nameDisplay = "compliance voltage";
+    yyaxis right
+    h1 = plot(x, y, '--o');
+    hold on
+    set(h1, 'Color', colorLineUnique{indexComp+3}, ...
+                'MarkerFaceColor',  colorLineUnique{indexComp+3}, ...
+                'MarkerEdgeColor', colorLineUnique{indexComp+3}, ...
+                'MarkerSize', 2, ...
+                'LineWidth', 1.5, ...
+                'DisplayName', nameDisplay);
+end
+
+ylimData = ylim;
+ylimData(1) = 5;
+ylimData(2) = 9;
+ylim(ylimData);
+ylabel('Compliance Voltage (V)', 'FontSize', 10, 'fontweight', 'bold', 'FontName', 'Arial');
+
+hleg = legend;
+set(hleg, 'FontSize', 10, 'visible', 'on', 'Location', 'southeast', 'FontName', 'Arial');
+
+ax.XAxis.FontSize = 14;
 
 xlimData = xlim;
 xlimData(1) = 0;

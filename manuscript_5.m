@@ -9,7 +9,7 @@ list_of_joints = {{'pelvisTop', 'hip', 'knee', 'hip angles'}, ...
              
 % startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Recruitment Curve\Medusa\Amp modulation\Spinal';
 % startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Recruitment Curve\Medusa';
-startPath = '/Users/sam/Library/CloudStorage/OneDrive-NorthwesternUniversity/WSI Videos for Manuscript/Recruitment Curve/Medusa';
+startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Recruitment Curve\Medusa';
 
 csvPaths = {
             'Pulse width modulation/Spinal', ...

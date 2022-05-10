@@ -10,7 +10,7 @@ list_of_joints = {{'pelvisTop', 'hip', 'knee', 'hip angles'}, ...
              
 startPath = '/Users/sam/Library/CloudStorage/OneDrive-NorthwesternUniversity/WSI Videos for Manuscript/';
 csvPaths = {
-            'Frequency modulation/New (10 to 250ms periodicity)'
+            'SCI'
             };
 
 numberFiles = length(csvPaths);
@@ -25,7 +25,7 @@ expressionFrequency = '(?<=([0-9]P))[0-9]+';
 expressionPulseWidth = '(?<=(PW))[0-9]+';
 
 
-targetTypeName = 'Freq_Modul';
+targetTypeName = 'SCI';
 dataFull.(targetTypeName).index = 1;
 dataFull.(targetTypeName).data = table;
 dataFull.(targetTypeName).name = cell(1000, 2);
@@ -41,7 +41,6 @@ for indexPath = 1:length(csvPaths)
     splitCSVPath = split(rawCSVPath, '/');
     nameGroup = string(strjoin(splitCSVPath, '-'));
     subjectName = splitCSVPath(1);
-    subjectGroup = splitCSVPath(2);
 
     filenames={myfiles(:).name}';
     filefolders={myfiles(:).folder}';

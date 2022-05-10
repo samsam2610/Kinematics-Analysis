@@ -8,6 +8,8 @@ stepPoint = 3;
 folderPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Skeletal Trajectory for diverse response';
 startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\Wireless Interface Kinematics\Skeletal Trajectory for diverse response\Skeletal Trajectory';
 
+folderPath = '/Users/sam/Library/CloudStorage/OneDrive-NorthwesternUniversity/WSI Videos for Manuscript/Skeletal Trajectory for diverse response';
+
 parameterTable = readtable('video-data.csv', 'DatetimeType','text', 'TextType', 'string');
 parameterTable.('RecordedDate') = datetime(parameterTable.('RecordedDate'), 'InputFormat', 'MM/dd/yy');
 
