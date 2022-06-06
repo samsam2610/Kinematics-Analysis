@@ -1,3 +1,4 @@
+addpath(genpath(pwd))
 %% Plot skeleton
 close all
 skipResolution = true;
@@ -5,11 +6,12 @@ subjectName = "Godzilla";
 numberOfPoints = 30;
 stepPoint = 3;
 % folderPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Skeletal Trajectory for diverse response';
-folderPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Skeletal Trajectory for diverse response';
+%folderPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Skeletal Trajectory for diverse response';
 startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\Wireless Interface Kinematics\Skeletal Trajectory for diverse response\Skeletal Trajectory';
 
-folderPath = '/Users/sam/Library/CloudStorage/OneDrive-NorthwesternUniversity/WSI Videos for Manuscript/Skeletal Trajectory for diverse response';
-
+% folderPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Skeletal Trajectory for diverse response';
+folderPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Skeletal Trajectory for diverse response';
+startPath = 'C:\Users\Zhong\OneDrive - Northwestern University\WSI Videos for Manuscript\Skeletal Trajectory for diverse response';
 parameterTable = readtable('video-data.csv', 'DatetimeType','text', 'TextType', 'string');
 parameterTable.('RecordedDate') = datetime(parameterTable.('RecordedDate'), 'InputFormat', 'MM/dd/yy');
 
@@ -23,9 +25,9 @@ list_of_joints = {{'pelvisTop', 'hip', 'knee', 'hip angles'}, ...
                  {'knee', 'ankle', 'MTP', 'ankle angles'}, ...
                  {'pelvisTop', 'hip', 'MTP', 'lower limb angles'}};
 
-colorLineUnique = {'#29ABE2', '#D95319', '#FF2F15', '#7E2F8E', '#35F6FF', ...
+colorLineUnique = {'#F15A24', '#D95319', '#FF2F15', '#7E2F8E', '#35F6FF', ...
                    '#4DBEEE', '#77AC30', '#40E0D0', '#6495ED', '#88A096', ...
-                   '#F8D210', '#94d2bd'};
+                   '#F8D210', '#FF00FF'};
 
 myfiles = dir(folderPath);
 
@@ -38,7 +40,7 @@ csvfolders = filefolders(endsWith(filenames,'.csv'));
 files = fullfile(csvfolders,csvfiles);
 
 plottingList = ["start", "end"];
-numberOfPointsList = [40, 30, 30];
+numberOfPointsList = [40, 30, 20];
 stepPointList = [2, 2, 2];
 
 for currentFileIndex = 1:length(files)
@@ -46,12 +48,14 @@ for currentFileIndex = 1:length(files)
     stepPoint = stepPointList(currentFileIndex);
     
     for plottingIndex = 1:1
+
         plottingType = plottingList(plottingIndex);
         currentFile = files{currentFileIndex};
         sampleName = csvfiles{currentFileIndex};
         currentTitle = split(sampleName, '_');
     
         [numberChannel, intensityLevel, pulseWidth, frequencyValue, currentDate, resolution] = getVideoData(sampleName, parameterTable);
+        resolution = mean(resolution);
         rawData = readcsvData(currentFile);
         [PIXELRESOLUTION, sampleName, sampleDate] = getPixelResolution(currentFile, skipResolution); %pixel per cm
     
@@ -85,7 +89,7 @@ for currentFileIndex = 1:length(files)
             dataCoordToPlot = dataFinalCoords;
             dataCoordToPlot = flip(dataCoordToPlot);
         end
-    
+        figure
         t = tiledlayout('flow', 'Padding', 'loose');
         ax = nexttile;
         set(gcf, 'PaperUnits','inches','PaperPosition',[0 0 1.96 1.58]);
@@ -95,13 +99,13 @@ for currentFileIndex = 1:length(files)
         for indexTable = 1:height(dataCoordToPlot) - 1
             skeletonInitial = SkeletonModel(dataCoordToPlot(indexTable, :), "resolution", resolution);
             plotName = '';
-            indexColor = 1;
+            indexColor = 12;
             LineStyle = '-';
             ax = skeletonInitial.plotPositionUpdate(ax, colorPallete=colorLineUnique{indexColor}, ...
                                                         plotNameDisplay=false, ...
                                                         flipSkeleton=flipSkeleton, ...
                                                         LineWidth= 0.5, ...
-                                                        LineStyle = '--', ...
+                                                        LineStyle = '-', ...
                                                         MarkerSize= 2);
         end
         
@@ -127,9 +131,9 @@ for currentFileIndex = 1:length(files)
         ax = skeletonMaximum.plotPositionUpdate(ax, colorPallete=colorLineUnique{3}, ...
                                                     plotName=plotNameList{1}, ...
                                                     flipSkeleton=flipSkeleton, ...
-                                                    LineWidth= 0.5, ...
+                                                    LineWidth= 1.5, ...
                                                     LineStyle = '-', ...
-                                                    MarkerSize= 2);
+                                                    MarkerSize= 6);
         pointMax = skeletonMaximum.toe;
         annotationMax = annotation('textarrow', 'String', plotNameList{1}, ...
                                                 'HeadStyle', 'none', ...
@@ -146,9 +150,9 @@ for currentFileIndex = 1:length(files)
         ax = skeletonResting.plotPositionUpdate(ax, colorPallete=colorLineUnique{5}, ...
                                                     plotName=plotNameList{2}, ...
                                                     flipSkeleton=flipSkeleton, ...
-                                                    LineWidth= 0.5, ...
+                                                    LineWidth= 1.5, ...
                                                     LineStyle= '-', ...
-                                                    MarkerSize= 3);
+                                                    MarkerSize= 6);
         pointRest = skeletonResting.toe;
         annotationRest = annotation('textarrow', 'String', plotNameList{2}, ...
                                                 'HeadStyle', 'none', ...
@@ -184,18 +188,6 @@ for currentFileIndex = 1:length(files)
         xlabel('Vertical displacement (cm)', 'FontSize', 10)
         ylabel('Horizontal displacement (cm)', 'FontSize', 10)
         title(t, "Toe trajectory from rest to max, at channel " + num2str(numberChannel-1) + " and intensity = " + num2str(intensityLevel), 'FontSize', 15);
-    
-%         ylimData = ylim;
-%         ylimData(1) = ylimData(1);
-%         ylimData(2) = ylimData(2) + 0.5;
-%         ylim(ylimData);
-%     
-%         xlimData = xlim;
-%         xlimData(1) = xlimData(1);
-%         xlimData(2) = xlimData(2) + 0.5;
-%         xlim(xlimData)
-
-
     
         figName = sampleName + " " + plottingType;
         ax = gcf;
